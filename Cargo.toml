@@ -1,0 +1,12 @@
+[package]
+name = "blendit"
+version = "0.1.0"
+authors = ["alexvilanovab <alexvilanovab@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+clap = "2.33.0"
+image = "0.21.2"
+imageproc = "0.18.0"
+indicatif = "0.11.0"
+rusttype = "0.7.7"
