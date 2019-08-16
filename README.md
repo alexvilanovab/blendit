@@ -20,7 +20,7 @@ git clone https://github.com/alexvilanovab/blendit
 cd blendit
 ```
 
-Compile the Rust project using `--release` flag so that it is fully optimized.
+Compile the project using `--release` flag so that it is fully optimized.
 
 ```
 cargo build --release
