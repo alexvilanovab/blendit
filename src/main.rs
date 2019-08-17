@@ -5,6 +5,8 @@ extern crate rusttype;
 
 mod cli;
 
+use blendit::*;
+
 fn main() {
     let args = cli::get_arguments();
 
@@ -25,16 +27,7 @@ fn main() {
             std::process::exit(1);
         }
     };
-    let mut txt_it = txt.chars();
 
-    let font_data: &[u8] = include_bytes!("../fonts/Bitter-Bold.ttf");
-    let font = match rusttype::Font::from_bytes(font_data) {
-        Ok(val) => val,
-        Err(e) => {
-            eprintln!("Could not load the given font file: {}", e);
-            std::process::exit(1);
-        }
-    };
     let font_size: u32 = match args.value_of("font_size").unwrap().parse() {
         Ok(val) => val,
         Err(e) => {
@@ -42,13 +35,9 @@ fn main() {
             std::process::exit(1);
         }
     };
-    let font_scale = rusttype::Scale {
-        x: (font_size as f32) * 1.5,
-        y: (font_size as f32) * 1.5,
-    };
+    let font = Font::new(font_size);
 
     let out_path = std::path::Path::new(args.value_of("output").unwrap());
-    let mut out = image::RgbImage::new(img.width() * font_size, img.height() * font_size);
 
     let bar = indicatif::ProgressBar::hidden();
     bar.set_position(0);
@@ -60,25 +49,7 @@ fn main() {
     );
     bar.set_draw_target(indicatif::ProgressDrawTarget::stderr());
 
-    for (x, y, rgb) in img.enumerate_pixels() {
-        let c = match txt_it.next() {
-            Some(val) => val.to_string(),
-            None => {
-                txt_it = txt.chars();
-                String::from(" ")
-            }
-        };
-        imageproc::drawing::draw_text_mut(
-            &mut out,
-            *rgb,
-            x * font_size,
-            y * font_size,
-            font_scale,
-            &font,
-            &c,
-        );
-        bar.inc(1)
-    }
+    let out = process(img, &txt, &font, || bar.inc(1));
 
     bar.finish();
 

@@ -1,0 +1,64 @@
+version: 2.1
+
+jobs:
+
+  test:
+    docker:
+      - image: rust:slim
+    working_directory: ~/repo
+    steps:
+      - checkout:
+          path: ~/repo
+      - restore_cache:
+          keys:
+            - test-registry-v1-{{ .Branch }}-{{ .Revision }}
+            - test-registry-v1-{{ .Branch }}-
+            - test-registry-v1-
+      - run:
+          name: Check formatting
+          command: |
+            rustup component add rustfmt
+            rustfmt --check **/*.rs
+      - run:
+          name: Linting
+          command: |
+            rustup component add clippy
+            cargo clippy --all-targets --all-features -- -D warnings
+      - save_cache:
+          key: test-registry-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - /root/.cargo/registry
+            - /root/.cargo/bin/rustfmt
+            - /root/.cargo/bin/clippy
+            - ./target
+
+  benchmark:
+    docker:
+      - image: rustlang/rust:nightly-slim
+    working_directory: ~/repo
+    steps:
+      - checkout:
+          path: ~/repo
+      - restore_cache:
+          keys:
+            - benchmark-registry-v1-{{ .Branch }}-{{ .Revision }}
+            - benchmark-registry-v1-{{ .Branch }}-
+            - benchmark-registry-v1-
+      - run:
+          name: Run benchmark
+          command: |
+            cargo bench
+      - save_cache:
+          key: benchmark-registry-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - /root/.cargo/registry
+            - /root/.cargo/bin/rustfmt
+            - /root/.cargo/bin/clippy
+            - ./target
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - test
+      - benchmark
