@@ -34,7 +34,7 @@ jobs:
 
   benchmark:
     docker:
-      - image: rustlang/rust:nightly-slim
+      - image: rustlang/rust:nightly
     working_directory: ~/repo
     steps:
       - checkout:
@@ -47,6 +47,8 @@ jobs:
       - run:
           name: Run benchmark
           command: |
+            cargo bench
+            git reset --hard origin/master
             cargo bench
       - save_cache:
           key: benchmark-registry-v1-{{ .Branch }}-{{ .Revision }}
