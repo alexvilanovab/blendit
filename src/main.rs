@@ -39,19 +39,19 @@ fn main() {
 
     let out_path = std::path::Path::new(args.value_of("output").unwrap());
 
-    let bar = indicatif::ProgressBar::hidden();
-    bar.set_position(0);
-    bar.set_length((img.width() * img.height()) as u64);
-    bar.set_style(
+    let progress_bar = indicatif::ProgressBar::hidden();
+    progress_bar.set_position(0);
+    progress_bar.set_length(u64::from(img.width() * img.height()));
+    progress_bar.set_style(
         indicatif::ProgressStyle::default_bar()
-            .template("[{elapsed_precise}] {bar:50} {pos}/{len}")
+            .template("[{elapsed_precise}] {progress_bar:50} {pos}/{len}")
             .progress_chars("■ "),
     );
-    bar.set_draw_target(indicatif::ProgressDrawTarget::stderr());
+    progress_bar.set_draw_target(indicatif::ProgressDrawTarget::stderr());
 
-    let out = process(img, &txt, &font, || bar.inc(1));
+    let out = process(img, &txt, &font, || progress_bar.inc(1));
 
-    bar.finish();
+    progress_bar.finish();
 
     match out.save(out_path) {
         Ok(_) => {

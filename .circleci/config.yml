@@ -23,7 +23,7 @@ jobs:
           name: Linting
           command: |
             rustup component add clippy
-            cargo clippy --all-targets --all-features -- -D warnings
+            cargo clippy --all-features -- -D warnings
       - save_cache:
           key: test-registry-v1-{{ .Branch }}-{{ .Revision }}
           paths:

@@ -1,7 +1,7 @@
 extern crate clap;
 
 pub fn get_arguments() -> clap::ArgMatches<'static> {
-    return clap::App::new("blendit")
+    clap::App::new("blendit")
         .version("0.1.0")
         .author("alexvilanovab <alexvilanovab@gmail.com>")
         .about("Blend images with text and generate amazing looking posters")
@@ -35,5 +35,5 @@ pub fn get_arguments() -> clap::ArgMatches<'static> {
                 .default_value("./output.jpg")
                 .help("Where you want to save the JPEG with the generated poster"),
         )
-        .get_matches();
+        .get_matches()
 }
