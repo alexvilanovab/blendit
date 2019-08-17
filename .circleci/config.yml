@@ -5,10 +5,8 @@ jobs:
   test:
     docker:
       - image: rust:slim
-    working_directory: ~/repo
     steps:
-      - checkout:
-          path: ~/repo
+      - checkout
       - restore_cache:
           keys:
             - test-registry-v1-{{ .Branch }}-{{ .Revision }}
@@ -35,10 +33,8 @@ jobs:
   benchmark:
     docker:
       - image: rustlang/rust:nightly
-    working_directory: ~/repo
     steps:
-      - checkout:
-          path: ~/repo
+      - checkout
       - restore_cache:
           keys:
             - benchmark-registry-v1-{{ .Branch }}-{{ .Revision }}
@@ -47,15 +43,15 @@ jobs:
       - run:
           name: Run benchmark
           command: |
-            cargo bench
+            cp comment_bench_on_github.sh /tmp/
+            cargo bench | grep bench: > after
             git reset --hard origin/master
-            cargo bench
+            cargo bench | grep bench: > before
+            /tmp/comment_bench_on_github.sh
       - save_cache:
           key: benchmark-registry-v1-{{ .Branch }}-{{ .Revision }}
           paths:
             - /root/.cargo/registry
-            - /root/.cargo/bin/rustfmt
-            - /root/.cargo/bin/clippy
             - ./target
 
 workflows:
@@ -63,4 +59,7 @@ workflows:
   build_and_test:
     jobs:
       - test
-      - benchmark
+      - benchmark:
+          filters:
+            branches:
+              ignore: master
