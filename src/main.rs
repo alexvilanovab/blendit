@@ -10,7 +10,7 @@ fn main() {
 
     let img_path = std::path::Path::new(args.value_of("image").unwrap());
     let img = match image::open(img_path) {
-        Ok(img) => img.to_rgb(),
+        Ok(img) => img.to_rgb8(),
         Err(e) => {
             eprintln!("Could not open the given image: {}", e);
             std::process::exit(1);
@@ -28,10 +28,10 @@ fn main() {
     let mut txt_it = txt.chars();
 
     let font_data: &[u8] = include_bytes!("../fonts/Bitter-Bold.ttf");
-    let font = match rusttype::Font::from_bytes(font_data) {
-        Ok(val) => val,
-        Err(e) => {
-            eprintln!("Could not load the given font file: {}", e);
+    let font = match rusttype::Font::try_from_bytes(font_data) {
+        Some(val) => val,
+        None => {
+            eprintln!("Could not load the given font file");
             std::process::exit(1);
         }
     };
